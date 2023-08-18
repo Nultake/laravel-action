@@ -27,37 +27,18 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1.21
+          php-version: 8.2
           extensions: dom, curl, libxml, mbstring, zip, pcntl
           ini-values: error_reporting=E_ALL
           tools: composer:v2
           coverage: none
 
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
-
-
-      - name: Install composer dependencies
-        run: |
-          composer install
-
       - name: Prepare Laravel Application
         run: |
+          composer install
           cp .env.example .env
           php artisan key:generate
-
-      - name: jwt secret create
-        run: php artisan jwt:secret -f
-
-
+          php artisan jwt:secret -f
 
       - name: Run tests
         env:
