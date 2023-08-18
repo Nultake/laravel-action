@@ -1,0 +1,49 @@
+name: pull requests
+
+on:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-22.04
+    container:
+      image: kirschbaumdevelopment/laravel-test-runner:8.2
+
+    services:
+      mysql:
+        image: mysql/mysql-server:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_ROOT_HOST: "%"
+          MYSQL_DATABASE: testing
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ALLOW_EMPTY_PASSWORD: 1
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install composer dependencies
+        working-directory: ./backend
+        run: |
+          composer install
+      
+      - name: Prepare Laravel Application
+        working-directory: ./backend
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: jwt secret create
+        working-directory: ./backend
+        run: php artisan jwt:secret -f
+
+      - name: Install composer dependencies
+        working-directory: ./backend
+        env:
+          DB_HOST: 127.0.0.1
+        run: php artisan test
+        
+
+      - run: mysql -v --host=127.0.0.1 --user=sail --password=password service_finder
