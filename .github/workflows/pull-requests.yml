@@ -51,6 +51,3 @@ jobs:
         env:
           DB_HOST: 127.0.0.1
         run: php artisan test
-
-
-      - run: mysql -v --host=127.0.0.1 --user=sail --password=password service_finder
