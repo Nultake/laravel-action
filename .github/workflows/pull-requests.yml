@@ -25,22 +25,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install composer dependencies
-        working-directory: ./backend
         run: |
           composer install
 
       - name: Prepare Laravel Application
-        working-directory: ./backend
         run: |
           cp .env.example .env
           php artisan key:generate
 
       - name: jwt secret create
-        working-directory: ./backend
         run: php artisan jwt:secret -f
 
       - name: Install composer dependencies
-        working-directory: ./backend
         env:
           DB_HOST: 127.0.0.1
         run: php artisan test
